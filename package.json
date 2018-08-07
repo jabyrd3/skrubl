@@ -1,0 +1,33 @@
+{
+  "name": "skrub",
+  "version": "0.0.1",
+  "description": "skribbl.io clone ",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jabyrd3/skrubl.git"
+  },
+  "keywords": [
+    "pictionary",
+    "game",
+    "open-source",
+    "websocket"
+  ],
+  "author": "jordan byrd",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jabyrd3/skrubl/issues"
+  },
+  "homepage": "https://github.com/jabyrd3/skrubl#readme",
+  "dependencies": {
+    "cors": "^2.8.4",
+    "express": "^4.16.3",
+    "redux": "^4.0.0",
+    "redux-act": "^1.7.4",
+    "socket.io": "^2.1.1"
+  }
+}
