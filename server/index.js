@@ -1,16 +1,27 @@
 //skrubl server, self-hosted skribl.io clone
 
+//support this fun / weird pattern
+const oa = Object.assign;
+const _ = require('lodash');
+const redux = require('redux');
 const act = require('redux-act');
 const actions = require('./actions');
-const express = require('express');
 
+// express & socket boilerplate
+const express = require('express');
 const app = express();
-const redux = require('redux');
 const cors = require('cors');
 const http = require('http');
 const server = http.createServer(app);
 const io = require('socket.io')(server);
-server.listen();
+server.listen(3000, '127.0.0.1');
+
+// serve client
+app.get('/', function(req, res){
+  res.sendFile(__dirname + '/index.html');
+});
+
+// constant to reset game chunk of store
 const freshGame = {
   game: {
     // array of socket ids
@@ -32,6 +43,7 @@ const freshGame = {
   }
 };
 
+// spawn store, bit ugly
 const store = redux.createStore(act.createReducer({
   [actions.lobbyMessage]: (s, p) => 
     oa({}, s, {
@@ -102,7 +114,8 @@ const store = redux.createStore(act.createReducer({
 }));
 
 io.on('connection', (s) => {
-  io.emit(store.dispatch(actions.addUser(s)))
+  io.emit(store.dispatch(actions.addUser(s.id)))
+  // console.log(s.id)
   s.on('lobbyMessage', (m) => socket.emit(store.dispatch(actions.lobbyMessage(m))));
   s.on('gameMessage', (m) => socket.emit(store.dispatch(actions.gameMessage(m))));
   s.on('pickWord', (w) => {
@@ -130,8 +143,8 @@ store.subscribe(() => {
   const currentState = store.getState();
   // this should be merged to save transit latency on chat / drawing 
   // those might need their own sockets, etc.
-  io.emit('globalUpdates', _.omit(oa({}, currentState, {
-    game: _.omit(currentState.game, 'chat')
-  }), ['lobbyChat']));
+  // io.emit('globalUpdates', _.omit(oa({}, currentState, {
+  //   game: _.omit(currentState.game, 'chat')
+  // }), ['lobbyChat']));
 
 });
