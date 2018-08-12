@@ -1,4 +1,4 @@
-<!doctype html>
+module.exports = (param) => `<!doctype html>
 <html>
   <head>
     <title>Socket.IO chat</title>
@@ -14,13 +14,8 @@
     </style>
   </head>
   <body>
-    <ul id="messages"></ul>
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
+    <div id="app"></div>
     <script src="/socket.io/socket.io.js"></script>
-	<script>
-	  var socket = io();
-	</script>
+    <script src="/static/drawgame.js"></script>
   </body>
-</html>
+</html>`;

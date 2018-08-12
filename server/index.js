@@ -14,13 +14,13 @@ const cors = require('cors');
 const http = require('http');
 const server = http.createServer(app);
 const io = require('socket.io')(server);
+const index = require('../client');
 server.listen(3000, '127.0.0.1');
 
 // serve client
-app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
+app.get('/', (req, res) => {
+  res.send(index());
 });
-
 // constant to reset game chunk of store
 const freshGame = {
   game: {
@@ -50,6 +50,7 @@ const store = redux.createStore(act.createReducer({
       lobbyChat: s.lobbyChat.concat([p])
     }),
   [actions.gameMessage]: (s, p) => 
+  console.log('gameMessage', s, p) ||
     // test if message includes correct word, if so, add user to game.guesses
     oa(s, {
       game: oa({}, s, {
@@ -114,10 +115,12 @@ const store = redux.createStore(act.createReducer({
 }));
 
 io.on('connection', (s) => {
+  console.log('connection', s.id)
   io.emit(store.dispatch(actions.addUser(s.id)))
   // console.log(s.id)
-  s.on('lobbyMessage', (m) => socket.emit(store.dispatch(actions.lobbyMessage(m))));
-  s.on('gameMessage', (m) => socket.emit(store.dispatch(actions.gameMessage(m))));
+  s.emit('populateState', store.getState());
+  s.on('lobbyMessage', m => io.emit(store.dispatch(actions.lobbyMessage(m))));
+  s.on('gameMessage', m => s.emit(store.dispatch(actions.gameMessage(m))));
   s.on('pickWord', (w) => {
     timer.start(90, ()=>{
       store.dispatch(actions.drawOver());

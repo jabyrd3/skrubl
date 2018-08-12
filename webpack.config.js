@@ -12,10 +12,10 @@ const url = (suffix) => {
  
 let config = {
   entry: isProd ?
-    'index.js' :
-    [`react-hot-loader/patch`, `webpack-dev-server/client?https://localhost:${process.env.DEV_PORT}`, 'index.js'],
+    'js/client.js' :
+    [`webpack-dev-server/client?http://localhost:${9000}`, 'js/client.js'],
   devtool: isProd ? false : 'cheap-module-source-map',
-  context: `${__dirname}/js`,
+  context: `${__dirname}/client`,
   watchOptions: {
     ignored: /node_modules/
   },
@@ -32,7 +32,7 @@ let config = {
     filename: 'drawgame.js',
   },
   module: {
-    loaders: [
+    rules: [
       {test: /\.json$/, loader: 'json-loader'},
       {
         test: /\.scss$/,
@@ -56,8 +56,7 @@ let config = {
         exclude: ['lodash'],
         loader: 'babel-loader',
         query: {
-          presets: ['react', 'es2015', 'stage-0'],
-          plugins: ['transform-decorators-legacy']
+          presets: ['react', 'es2015', 'stage-0']
         }
       }
     ]
@@ -78,26 +77,26 @@ if (!isProd){
   config.devServer = {
     contentBase: './client/build/',
     compress: true,
-    port: conf.devPort,
-    public: `localhost:${process.env.DEV_PORT}`,
+    port: 9000,
+    public: `localhost:${9000}`,
     host: '0.0.0.0',
     headers: {
         'Access-Control-Allow-Origin': '*'
     },
     proxy:{
       '/socket.io/socket.io.js': {
-        target: `http://localhost:${conf.port}/socket.io/socket.io.js`,
+        target: `http://localhost:${3000}/socket.io/socket.io.js`,
         ws: false
       },
       '/socket.io/*': {
-        target: `ws://localhost:${conf.port}/socket.io`,
+        target: `ws://localhost:${3000}/socket.io`,
         ws: true,
       },
       '*': {
-        target: `http://localhost:${conf.port}`,
+        target: `http://localhost:${3000}`,
       }
     }
   };
-  config.output.publicPath = `https://localhost:${process.env.DEV_PORT}/static/`;
+  config.output.publicPath = `http://localhost:${9000}/static/`;
 }
 module.exports = config;
