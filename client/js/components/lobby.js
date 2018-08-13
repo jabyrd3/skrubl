@@ -7,11 +7,18 @@ class Lobby extends React.Component{
   }
   render(){
     return <div>
+      YOU: {this.props.me}<br/>
+      leader: {this.props.leader}<br/><br/>
+      {this.props.users.map(u=><p>{u}</p>)}
       <Chat type="lobby" />
     </div>;
   }
 }
 
 export default connect((s, op) => {
-  return {};
+  return {
+    users: s.users,
+    me: s.you,
+    leader: s.leader
+  };
 })(Lobby);

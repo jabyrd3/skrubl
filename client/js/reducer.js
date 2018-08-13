@@ -32,14 +32,20 @@ export default createReducer({
     return oa({}, s, {game: oa({}, s.game, {chat: s.game.chat.concat([p.payload])})});
 	},
 	[actions.addUser]: (s, p) => {
+    return oa({}, s, {users: s.users.concat([p.payload])})
 	},
 	[actions.userLeft]: (s, p) => {
+    console.log('userleft', s, p);
+    return oa({}, s, {users: p});
 	},
 	[actions.newGame]: (s, p) => {
 	},
 	[actions.gameOver]: (s, p) => {
     return oa({}, s, ...freshGame);
 	},
+  [actions.setLeader]: (s, p) => {
+    return oa({}, s, {leader: p});
+  },
   [actions.populateState]: (s, p) => {
     return p;
   }

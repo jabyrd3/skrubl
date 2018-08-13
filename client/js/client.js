@@ -18,7 +18,9 @@ window.__REDUX_DEVTOOLS_EXTENSION__());
 socket.on('populateState', s => console.log("fuck") || store.dispatch(actions.populateState(s)));
 socket.on('lobbyMessage', s => console.log("lobbyMessage") || store.dispatch(actions.lobbyMessage(s)))
 socket.on('gameMessage', s => console.log("gamemessage",s.payload) || store.dispatch(actions.gameMessage(s)))
-
+socket.on('userLeft', s => console.log("userLeft",s.payload) || store.dispatch(actions.userLeft(s)))
+socket.on('addUser', s => console.log("addUser", s.payload) || store.dispatch(actions.addUser(s)))
+socket.on('setLeader', s => store.dispatch(actions.setLeader(s)))
 class App extends React.Component{
   constructor(props){
     super(props);

@@ -59,6 +59,7 @@ const store = redux.createStore(act.createReducer({
           s.game.currentCorrect
     })}),
   [actions.addUser]: (s, p) =>
+  console.log('addUser', p)||
     oa({}, s, {
       users: s.users.concat([p])
     }),
@@ -70,9 +71,9 @@ const store = redux.createStore(act.createReducer({
           {[u.id]: u.nick})
     }), 
   [actions.userLeft]: (s, p) =>
-  console.log('userlef', p) || 
+  console.log('userlef', s.users, p) || 
     oa({}, s, {
-      users: s.users.filter(u => p === u.id)
+      users: s.users.filter(u => p !== u)
     }),
   [actions.newGame]: (s, p) =>
     oa({}, s, {lobby: false}, {
@@ -99,6 +100,11 @@ const store = redux.createStore(act.createReducer({
         drawer: s.users.find(u => s.game.drawn.indexOf(u.id) === -1)
       })
     }),
+  [actions.setLeader]: (s, p) => 
+    console.log('setting leader to ', p)||
+    oa({}, s, {
+      leader: p
+    }),
   [actions.roundOver]: (s, p) => 
     oa({}, s, {
       game: oa({}, s.game, {
@@ -111,14 +117,18 @@ const store = redux.createStore(act.createReducer({
   users: [],
   lobbyChat: [],
   ...freshGame,
-  lobby: true
+  lobby: true,
+  leader: false
 }));
 
 io.on('connection', (s) => {
   console.log('connection', s.id)
-  io.emit(store.dispatch(actions.addUser(s.id)))
+  io.emit('addUser', store.dispatch(actions.addUser(s.id)))
   // overwrite client state with in progress details
-  s.emit('populateState', store.getState());
+  if(store.getState().leader === false){
+    store.dispatch(actions.setLeader(s.id));
+  }
+  s.emit('populateState', {...store.getState(), you: s.id});
   s.on('lobbyMessage', m => io.emit('lobbyMessage', store.dispatch(actions.lobbyMessage(m))));
   s.on('gameMessage', m => io.emit('gameMessage', store.dispatch(actions.gameMessage(m))));
   s.on('pickWord', (w) => {
@@ -138,7 +148,24 @@ io.on('connection', (s) => {
     store.dispatch(actions.startDraw())
   });
   s.on('editNick', (u) => socket.emit(store.dispatch(actions.editNick(u))))
-  s.on('disconnect', (u) => store.dispatch(actions.userLeft(s.id)));
+  s.on('disconnect', (u) => {
+    store.dispatch(actions.userLeft(s.id));
+    setTimeout(() => io.emit('userLeft', store.getState().users), 0)
+    setTimeout(()=>{
+
+      const state = store.getState()
+      if(s.id === state.leader){
+        if(state.users.length > 0){
+          console.log('users connected');
+          store.dispatch(actions.setLeader(state.users[Math.floor(Math.random() * state.users.length) + 0  ]))
+          setTimeout(()=>io.emit('setLeader', store.getState().leader), 0);
+        }else{
+          console.log('set to false', state.users)
+          store.dispatch(actions.setLeader(false));
+        }
+      }
+      }, 0);
+  });
 });
 
 store.subscribe(() => {
