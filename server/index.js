@@ -71,7 +71,7 @@ const store = redux.createStore(act.createReducer({
           u :
           {
             id: u.id,
-            nick: u.nick
+            nick: p.nick
           })
     }), 
   [actions.userLeft]: (s, p) =>
