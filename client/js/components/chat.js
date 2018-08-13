@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import ChatWindow from './chatWindow';
 import uuid from 'uuid/v4';
 
-export default class chat extends React.Component {
+export default class Chat extends React.Component {
   static propTypes = {
   };
 

@@ -50,7 +50,6 @@ const store = redux.createStore(act.createReducer({
       lobbyChat: s.lobbyChat.concat([p])
     }),
   [actions.gameMessage]: (s, p) => 
-  console.log('gameMessage', s, p) ||
     // test if message includes correct word, if so, add user to game.guesses
     oa({}, s, {
       game: oa({}, s.game, {
@@ -112,13 +111,13 @@ const store = redux.createStore(act.createReducer({
   users: [],
   lobbyChat: [],
   ...freshGame,
-  lobby: false
+  lobby: true
 }));
 
 io.on('connection', (s) => {
   console.log('connection', s.id)
   io.emit(store.dispatch(actions.addUser(s.id)))
-  // console.log(s.id)
+  // overwrite client state with in progress details
   s.emit('populateState', store.getState());
   s.on('lobbyMessage', m => io.emit('lobbyMessage', store.dispatch(actions.lobbyMessage(m))));
   s.on('gameMessage', m => io.emit('gameMessage', store.dispatch(actions.gameMessage(m))));
