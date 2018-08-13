@@ -129,8 +129,14 @@ io.on('connection', (s) => {
     store.dispatch(actions.setLeader(s.id));
   }
   s.emit('populateState', {...store.getState(), you: s.id});
-  s.on('lobbyMessage', m => io.emit('lobbyMessage', store.dispatch(actions.lobbyMessage(m))));
-  s.on('gameMessage', m => io.emit('gameMessage', store.dispatch(actions.gameMessage(m))));
+  s.on('lobbyMessage', m => io.emit('lobbyMessage', store.dispatch(actions.lobbyMessage({
+    ...m,
+    user: s.id
+  }))));
+  s.on('gameMessage', m => io.emit('gameMessage', store.dispatch(actions.gameMessage({
+    ...m,
+    user: s.id}
+    ))));
   s.on('pickWord', (w) => {
     timer.start(90, ()=>{
       store.dispatch(actions.drawOver());

@@ -8,7 +8,7 @@ export class ChatWindow extends React.Component {
         const {dispatch, type, messages} = this.props;
         return (
           <div className="messages">{messages
-              .map(msg => <p key={msg.uuid}>{msg.body}</p>)}</div>
+              .map(msg => <p key={msg.uuid}>{msg.user} : {msg.body}</p>)}</div>
         );
     }
 }
