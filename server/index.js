@@ -64,16 +64,20 @@ const store = redux.createStore(act.createReducer({
       users: s.users.concat([p])
     }),
   [actions.editNick]: (s, p) => 
+  console.log('editnick', p)||
     oa({}, s, {
       users: s.users.map(u =>
         u.id !== p.id ?
           u :
-          {[u.id]: u.nick})
+          {
+            id: u.id,
+            nick: u.nick
+          })
     }), 
   [actions.userLeft]: (s, p) =>
   console.log('userlef', s.users, p) || 
     oa({}, s, {
-      users: s.users.filter(u => p !== u)
+      users: s.users.filter(u => p !== u.id)
     }),
   [actions.newGame]: (s, p) =>
     oa({}, s, {lobby: false}, {
@@ -123,12 +127,18 @@ const store = redux.createStore(act.createReducer({
 
 io.on('connection', (s) => {
   console.log('connection', s.id)
-  io.emit('addUser', store.dispatch(actions.addUser(s.id)))
+  io.emit('addUser', store.dispatch(actions.addUser({
+    id:s.id,
+    nick: false
+  })))
   // overwrite client state with in progress details
   if(store.getState().leader === false){
     store.dispatch(actions.setLeader(s.id));
   }
-  s.emit('populateState', {...store.getState(), you: s.id});
+  s.emit('populateState', {...store.getState(), you: {
+    id: s.id,
+    nick: false
+  }});
   s.on('lobbyMessage', m => io.emit('lobbyMessage', store.dispatch(actions.lobbyMessage({
     ...m,
     user: s.id
@@ -153,7 +163,7 @@ io.on('connection', (s) => {
     });
     store.dispatch(actions.startDraw())
   });
-  s.on('editNick', (u) => socket.emit(store.dispatch(actions.editNick(u))))
+  s.on('editNick', (u) => io.emit('editNick', store.dispatch(actions.editNick({id:s.id, nick: u}))))
   s.on('disconnect', (u) => {
     store.dispatch(actions.userLeft(s.id));
     setTimeout(() => io.emit('userLeft', store.getState().users), 0)
@@ -163,7 +173,7 @@ io.on('connection', (s) => {
       if(s.id === state.leader){
         if(state.users.length > 0){
           console.log('users connected');
-          store.dispatch(actions.setLeader(state.users[Math.floor(Math.random() * state.users.length) + 0  ]))
+          store.dispatch(actions.setLeader(state.users[Math.floor(Math.random() * state.users.length) + 0].id))
           setTimeout(()=>io.emit('setLeader', store.getState().leader), 0);
         }else{
           console.log('set to false', state.users)

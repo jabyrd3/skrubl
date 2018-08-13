@@ -8,3 +8,4 @@ export const newGame = createAction('game started');
 export const gameOver = createAction('game ended');
 export const populateState = createAction('populate state on initial connection');
 export const setLeader = createAction('new leader chosen by server');
+export const editNick = createAction('nick updated');

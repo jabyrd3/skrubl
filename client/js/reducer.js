@@ -48,6 +48,14 @@ export default createReducer({
   },
   [actions.populateState]: (s, p) => {
     return p;
+  },
+  [actions.editNick]: (s, p) => {
+    console.log('editNick', p, s.users)
+    return oa({}, s, {
+      users: s.users.map(u => u.id === p.id ?
+        p :
+        u) 
+    });
   }
 }, {
   users: [],

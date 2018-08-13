@@ -7,5 +7,6 @@ module.exports = {
   userLeft: ra.createAction('user disconnected'),
   newGame: ra.createAction('game started'),
   gameOver: ra.createAction('game ended'),
-  setLeader: ra.createAction('set a new leader')
+  setLeader: ra.createAction('set a new leader'),
+  editNick: ra.createAction('edit a users nick')
 };
