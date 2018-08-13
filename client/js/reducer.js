@@ -25,9 +25,11 @@ const freshGame = {
 
 export default createReducer({
 	[actions.lobbyMessage]: (s, p) => {
-		return oa(s, lobbyChat.concat([p.body]));
+		return oa({}, s, {lobbyChat: s.lobbyChat.slice().concat([p.payload])});
 	},
 	[actions.gameMessage]: (s, p) => {
+    console.log('gamemessage', p);
+    return oa({}, s, {game: oa({}, s.game, {chat: s.game.chat.concat([p.payload])})});
 	},
 	[actions.addUser]: (s, p) => {
 	},
@@ -36,7 +38,7 @@ export default createReducer({
 	[actions.newGame]: (s, p) => {
 	},
 	[actions.gameOver]: (s, p) => {
-
+    return oa({}, s, ...freshGame);
 	},
   [actions.populateState]: (s, p) => {
     return p;

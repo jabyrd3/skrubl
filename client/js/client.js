@@ -13,9 +13,10 @@ const store = createStore(reducer, window.__REDUX_DEVTOOLS_EXTENSION__ &&
 window.__REDUX_DEVTOOLS_EXTENSION__());
 
 socket.on('populateState', s => console.log("fuck") || store.dispatch(actions.populateState(s)));
-socket.on('lobbyMessage', s => store.dispatch(actions.lobbyMessage(s)))
+socket.on('lobbyMessage', s => console.log("lobbyMessage") || store.dispatch(actions.lobbyMessage(s)))
+socket.on('gameMessage', s => console.log("gamemessage",s.payload) || store.dispatch(actions.gameMessage(s)))
 const App = () => <div>
-	<Chat />
+	<Chat type="game" />
 </div>;
 
 ReactDOM.render(

@@ -39,7 +39,7 @@ const freshGame = {
     // array of ids representing those who have drawn
     drawn: [],
     // current guess word
-    currentWord: ''
+    currentWord: 'dogass'
   }
 };
 
@@ -52,8 +52,8 @@ const store = redux.createStore(act.createReducer({
   [actions.gameMessage]: (s, p) => 
   console.log('gameMessage', s, p) ||
     // test if message includes correct word, if so, add user to game.guesses
-    oa(s, {
-      game: oa({}, s, {
+    oa({}, s, {
+      game: oa({}, s.game, {
         chat: s.game.chat.concat(p),
         currentCorrect: p.body.indexOf(s.game.currentWord) > -1 ?
           s.game.currentCorrect.concat([p.id]) :
@@ -71,8 +71,9 @@ const store = redux.createStore(act.createReducer({
           {[u.id]: u.nick})
     }), 
   [actions.userLeft]: (s, p) =>
+  console.log('userlef', p) || 
     oa({}, s, {
-      users: s.users.filter(u => p.id === u.id)
+      users: s.users.filter(u => p === u.id)
     }),
   [actions.newGame]: (s, p) =>
     oa({}, s, {lobby: false}, {
@@ -119,8 +120,8 @@ io.on('connection', (s) => {
   io.emit(store.dispatch(actions.addUser(s.id)))
   // console.log(s.id)
   s.emit('populateState', store.getState());
-  s.on('lobbyMessage', m => io.emit(store.dispatch(actions.lobbyMessage(m))));
-  s.on('gameMessage', m => s.emit(store.dispatch(actions.gameMessage(m))));
+  s.on('lobbyMessage', m => io.emit('lobbyMessage', store.dispatch(actions.lobbyMessage(m))));
+  s.on('gameMessage', m => io.emit('gameMessage', store.dispatch(actions.gameMessage(m))));
   s.on('pickWord', (w) => {
     timer.start(90, ()=>{
       store.dispatch(actions.drawOver());
@@ -137,8 +138,8 @@ io.on('connection', (s) => {
     });
     store.dispatch(actions.startDraw())
   });
-  io.on('editNick', (u) => socket.emit(store.dispatch(actions.editNick(u))))
-  io.on('disconnect', (u) => store.dispatch(actions.userLeft(u)));
+  s.on('editNick', (u) => socket.emit(store.dispatch(actions.editNick(u))))
+  s.on('disconnect', (u) => store.dispatch(actions.userLeft(s.id)));
 });
 
 store.subscribe(() => {

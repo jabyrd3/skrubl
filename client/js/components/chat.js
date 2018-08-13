@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ChatWindow from './chatWindow';
-const type="lobby";
+import uuid from 'uuid/v4';
+
 export default class chat extends React.Component {
   static propTypes = {
   };
@@ -14,15 +15,17 @@ export default class chat extends React.Component {
   }
 
   render() {
-
+    const {type} = this.props;
     return (
         <div>
           <ChatWindow
-            type="lobby" />
+            type={type} />
             <form onSubmit={e => {
-              console.log('submit firing', this.state.message);
               e.preventDefault();
-              socket.emit(`${type}Message`, {body: this.state.message})
+              socket.emit(`${type}Message`, {
+                body: this.state.message,
+                uuid: uuid()
+              })
               this.setState({message: ''});
             }}>
               <input
