@@ -8,5 +8,6 @@ module.exports = {
   newGame: ra.createAction('game started'),
   gameOver: ra.createAction('game ended'),
   setLeader: ra.createAction('set a new leader'),
-  editNick: ra.createAction('edit a users nick')
+  editNick: ra.createAction('edit a users nick'),
+  startDraw: ra.createAction('drawing started')
 };

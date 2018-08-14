@@ -22,7 +22,8 @@ socket.on('userLeft', s => console.log("userLeft",s.payload) || store.dispatch(a
 socket.on('addUser', s => console.log("addUser", s.payload) || store.dispatch(actions.addUser(s)))
 socket.on('setLeader', s => store.dispatch(actions.setLeader(s)))
 socket.on('editNick', s => store.dispatch(actions.editNick(s.payload)))
-socket.on('startGame', s => store.dispatch(actions.newGame()))
+socket.on('startGame', s => store.dispatch(actions.newGame(s)))
+socket.on('mergeGame', s => store.dispatch(actions.mergeGame(s)))
 class App extends React.Component{
   constructor(props){
     super(props);

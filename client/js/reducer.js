@@ -19,7 +19,9 @@ const freshGame = {
     // array of ids representing those who have drawn
     drawn: [],
     // current guess word
-    currentWord: ''
+    currentWord: '',
+    wordPicked: false,
+    wordOpts: []
   }
 };
 
@@ -28,19 +30,17 @@ export default createReducer({
 		return oa({}, s, {lobbyChat: s.lobbyChat.slice().concat([p.payload])});
 	},
 	[actions.gameMessage]: (s, p) => {
-    console.log('gamemessage', p);
     return oa({}, s, {game: oa({}, s.game, {chat: s.game.chat.concat([p.payload])})});
 	},
 	[actions.addUser]: (s, p) => {
     return oa({}, s, {users: s.users.concat([p.payload])})
 	},
 	[actions.userLeft]: (s, p) => {
-    console.log('userleft', s, p);
     return oa({}, s, {users: p});
 	},
 	[actions.newGame]: (s, p) => {
     return oa({}, s, {
-      ...freshGame,
+      game: p,
       lobby: false
     });
 	},
@@ -54,11 +54,15 @@ export default createReducer({
     return p;
   },
   [actions.editNick]: (s, p) => {
-    console.log('editNick', p, s.users)
     return oa({}, s, {
       users: s.users.map(u => u.id === p.id ?
         p :
         u) 
+    });
+  },
+  [actions.mergeGame]: (s, p) => {
+    return oa({}, s, {
+      game: oa({}, s.game, p)
     });
   }
 }, {
