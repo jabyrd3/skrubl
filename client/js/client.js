@@ -9,6 +9,7 @@ import reducer from './reducer';
 import * as actions from './actions';
 import Lobby from './components/lobby';
 import Game from './components/game';
+require('milligram/dist/milligram.min.css');
 
 global.socket = io();
 
