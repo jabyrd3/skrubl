@@ -7,6 +7,7 @@ class Game extends React.Component{
   }
   render(){
     return <div>
+      <h2>game</h2>
       <Chat type="game" />
     </div>;
   }

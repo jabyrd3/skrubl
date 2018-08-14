@@ -39,6 +39,10 @@ export default createReducer({
     return oa({}, s, {users: p});
 	},
 	[actions.newGame]: (s, p) => {
+    return oa({}, s, {
+      ...freshGame,
+      lobby: false
+    });
 	},
 	[actions.gameOver]: (s, p) => {
     return oa({}, s, ...freshGame);

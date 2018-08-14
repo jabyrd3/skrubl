@@ -9,8 +9,9 @@ class Lobby extends React.Component{
     };
   }
   render(){
-    const {me} = this.props;
+    const {me, leader} = this.props;
     return <div>
+      <h2>lobby</h2>
       YOU: {this.props.me.nick || this.props.me.id}<br/>
       leader: {this.props.leader}<br/><br/>
       {this.props.users.map(u=><p>{u.nick || u.id}</p>)}
@@ -19,11 +20,14 @@ class Lobby extends React.Component{
         <div>
           <input
             type="text"
-            placeHolder="pick a nick basket"
+            placeholder="pick a nick basket"
             onChange={e => this.setState({nick: e.currentTarget.value})} />
           <button onClick={()=>{
             socket.emit('editNick', this.state.nick);
           }}>Pick the nick</button>
+          {me.id === leader &&
+            <button
+              onClick={() => socket.emit('startGame')}>Start the game</button>}
         </div>}
       <Chat type="lobby" />
     </div>;

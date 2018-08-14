@@ -51,11 +51,12 @@ const store = redux.createStore(act.createReducer({
     }),
   [actions.gameMessage]: (s, p) => 
     // test if message includes correct word, if so, add user to game.guesses
+      console.log('gamemessage', p) ||
     oa({}, s, {
       game: oa({}, s.game, {
         chat: s.game.chat.concat(p),
         currentCorrect: p.body.indexOf(s.game.currentWord) > -1 ?
-          s.game.currentCorrect.concat([p.id]) :
+          s.game.currentCorrect.concat([p.user]) :
           s.game.currentCorrect
     })}),
   [actions.addUser]: (s, p) =>
@@ -147,6 +148,7 @@ io.on('connection', (s) => {
     ...m,
     user: s.id}
     ))));
+  s.on('startGame', () => io.emit('startGame'));
   s.on('pickWord', (w) => {
     timer.start(90, ()=>{
       store.dispatch(actions.drawOver());
@@ -187,6 +189,7 @@ io.on('connection', (s) => {
 store.subscribe(() => {
 
   const currentState = store.getState();
+  console.log('stateChange', currentState)
   // this should be merged to save transit latency on chat / drawing 
   // those might need their own sockets, etc.
   // io.emit('globalUpdates', _.omit(oa({}, currentState, {
