@@ -13,7 +13,7 @@ class Game extends React.Component{
       {me.id !== drawer && !game.wordPicked && <div>
         <h2>{(()=>{
           const user = users.find(u=>u.id === drawer);
-          return user.nick || user.id;
+          return user && (user.nick || user.id) || 'null';
         })()} is picking a word</h2>
         </div>}
       {me.id === drawer && game.wordPicked &&

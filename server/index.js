@@ -93,7 +93,9 @@ const store = redux.createStore(act.createReducer({
       game: !s.lobby ?
         s.game.drawer === p ?
           oa({}, s.game, {
-            drawer: randomUser(s.users.filter(u=>p!==u.id))
+            drawer: randomUser(s.users.filter(u=>p!==u.id)),
+            wordPicked: false,
+            wordOpts: randomWords(5)
           }) : s.game : s.game
     }),
   [actions.newGame]: (s, p) =>
@@ -148,6 +150,8 @@ const store = redux.createStore(act.createReducer({
   lobby: true,
   leader: false
 }), redux.applyMiddleware(logger));
+// debug
+global.store = store;
 
 io.on('connection', (s) => {
   io.emit('addUser', store.dispatch(actions.addUser({
@@ -218,7 +222,7 @@ io.on('connection', (s) => {
     store.dispatch(actions.userLeft(s.id));
     setTimeout(() => io.emit('userLeft', store.getState().users), 0)
     setTimeout(() => {
-      const state = store.getState()
+      const state = store.getState();
       if (s.id === state.leader){
         if (state.users.length > 0){
           store.dispatch(actions.setLeader(randomUser(state.users)));
@@ -228,5 +232,19 @@ io.on('connection', (s) => {
         }
       }
       }, 0);
+    setTimeout(()=>{
+      const state = store.getState();
+      if(!state.lobby){
+        io.emit('mergeGame', {
+          wordPicked: false,
+          drawer: state.game.drawer,
+        });
+        io.to(state.game.drawer).emit('mergeGame', {
+          wordPicked: false,
+          drawer: state.game.drawer,
+          wordOpts: state.game.wordOpts
+        })
+      }
+    }, 20)
   });
 });
