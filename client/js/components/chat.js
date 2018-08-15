@@ -5,6 +5,7 @@ import uuid from 'uuid/v4';
 
 export default class Chat extends React.Component {
   static propTypes = {
+    className: PropTypes.string
   };
 
   constructor(props) {
@@ -17,7 +18,7 @@ export default class Chat extends React.Component {
   render() {
     const {type} = this.props;
     return (
-        <div>
+        <div className={this.props.className}>
           <ChatWindow
             type={type} />
             <form onSubmit={e => {

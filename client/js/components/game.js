@@ -36,15 +36,17 @@ class Game extends React.Component{
       {me.id !== drawer && !game.wordPicked && <div>
         <h2>{foundDrawer ? foundDrawer.nick ? foundDrawer.nick : foundDrawer.id : 'null'} is picking a word</h2>
         </div>}
+      <div className="container">
+      <div className="row">
       {me.id !== drawer && game.wordPicked &&
-        <div>
+        <div className="column column-75">
           <h2>{foundDrawer ? foundDrawer.nick ? foundDrawer.nick : foundDrawer.id : 'null'} is drawing</h2>
           <CanvasDraw 
             disabled={true}
             ref={canvy=>this.canvy=canvy}/>
         </div>}
       {me.id === drawer && game.wordPicked &&
-        <div>
+        <div className="column column-75">
           <h2>Draw below!</h2>
           <CanvasDraw 
             ref={canvy=>this.canvy=canvy}
@@ -61,7 +63,9 @@ class Game extends React.Component{
             game.wordOpts.map(opt =>
               <p onClick={()=>socket.emit('pickWord', opt)}>{opt}</p>)}
         </div>}
-      <Chat type="game" />
+      <Chat className="column column-25" type="game" />
+      </div>
+      </div>
     </div>;
   }
 }
