@@ -9,5 +9,6 @@ module.exports = {
   gameOver: ra.createAction('game ended'),
   setLeader: ra.createAction('set a new leader'),
   editNick: ra.createAction('edit a users nick'),
-  startDraw: ra.createAction('drawing started')
+  startDraw: ra.createAction('drawing started'),
+  updateDrawing: ra.createAction('concat lines to drawing')
 };

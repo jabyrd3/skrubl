@@ -24,8 +24,10 @@ const wordListPath = require('word-list');
 const wordArray = fs.readFileSync(wordListPath, 'utf8').split('\n');
 
 // util, split this out
-const randomUser = (users) => 
-  users[Math.floor(Math.random() * users.length) + 0].id;
+const randomUser = (users) => {
+  const target = users[Math.floor(Math.random() * users.length) + 0];
+  return target ? target.id : false;
+}
 const randomWords = (count) =>
   Array.from({length: count}).map(() =>
     wordArray[Math.floor(Math.random() * wordArray.length) + 0]);
@@ -54,7 +56,8 @@ const freshGame = {
     // current guess word
     currentWord: '',
     wordPicked: false,
-    wordOpts: []
+    wordOpts: [],
+    drawing: []
   }
 };
 
@@ -90,7 +93,10 @@ const store = redux.createStore(act.createReducer({
   [actions.userLeft]: (s, p) =>
     oa({}, s, {
       users: s.users.filter(u => p !== u.id),
+      lobby: s.users.length === 1 ? true : s.lobby,
+      leader: s.users.length === 1 ? false : s.leader,
       game: !s.lobby ?
+        s.users.length === 1 ? oa({}, freshGame.game) :
         s.game.drawer === p ?
           oa({}, s.game, {
             drawer: randomUser(s.users.filter(u=>p!==u.id)),
@@ -135,6 +141,13 @@ const store = redux.createStore(act.createReducer({
     oa({}, s, {
       leader: p
     }),
+  [actions.updateDrawing] : (s, p) => {
+    return oa({}, s, {
+      game: oa({}, s.game, {
+        drawing: s.game.drawing.concat(p)
+      })
+    });
+  },
   [actions.roundOver]: (s, p) => 
     oa({}, s, {
       game: oa({}, s.game, {
@@ -191,6 +204,10 @@ io.on('connection', (s) => {
         wordOpts: state.game.wordOpts
       });
     }, 0);
+  });
+  s.on('updateDrawing', d => {
+    store.dispatch(actions.updateDrawing(d));
+    io.emit('receiveLines', d)
   });
   s.on('pickWord', (w) => {
     // timer.start(90, ()=>{

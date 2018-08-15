@@ -1,24 +1,57 @@
 import React from 'react';
 import {connect} from 'react-redux';
+import CanvasDraw from 'react-canvas-draw';
 import Chat from './chat';
+import _ from 'lodash';
 class Game extends React.Component{
   constructor(props){
     super(props);
+    this.state = {
+      lines: [],
+      index: 0
+    };
+    this.throttled = _.throttle(this.updateDrawing.bind(this), 200);
+  }
+  componentWillReceiveProps(np){
+    if(np.game.lines !== this.props.game.lines){
+      this.setState({
+        lines: this.state.lines.concat(np.game.lines)
+      });
+      setTimeout(() => {
+        this.state.lines.map(line=>this.canvy.drawLine(line));
+        this.setState({lines: []})
+      }, 0);
+    }
+  }
+  updateDrawing(){
+    socket.emit('updateDrawing', this.state.lines);
+    this.setState({index: this.state.lines.length});
+    this.setState({lines: []});
   }
   render(){
     const {me, drawer, game, users} = this.props;
-    console.log(this.props)
+    const foundDrawer = users.find(u=>u.id === drawer);
     return !me || !game ? <h2>fetching state...</h2> : <div>
       <h2>game</h2>
       {me.id !== drawer && !game.wordPicked && <div>
-        <h2>{(()=>{
-          const user = users.find(u=>u.id === drawer);
-          return user && (user.nick || user.id) || 'null';
-        })()} is picking a word</h2>
+        <h2>{foundDrawer ? foundDrawer.nick ? foundDrawer.nick : foundDrawer.id : 'null'} is picking a word</h2>
+        </div>}
+      {me.id !== drawer && game.wordPicked &&
+        <div>
+          <h2>{foundDrawer ? foundDrawer.nick ? foundDrawer.nick : foundDrawer.id : 'null'} is drawing</h2>
+          <CanvasDraw 
+            disabled={true}
+            ref={canvy=>this.canvy=canvy}/>
         </div>}
       {me.id === drawer && game.wordPicked &&
         <div>
           <h2>Draw below!</h2>
+          <CanvasDraw 
+            ref={canvy=>this.canvy=canvy}
+            onChange={e => {
+              this.setState({lines: e.slice(this.state.index, e.length)})
+              this.throttled();
+            }}/>
         </div>}
       {me.id === drawer &&
         !game.wordPicked &&
@@ -34,11 +67,11 @@ class Game extends React.Component{
 }
 
 export default connect((s, op) => {
-  console.log('jab', s.you)
   return {
     me: s.you,
     drawer: s.game.drawer,
     game: s.game,
-    users: s.users
+    users: s.users,
+    lines: s.game.lines
   };
 })(Game);

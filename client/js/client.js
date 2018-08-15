@@ -25,6 +25,7 @@ socket.on('setLeader', s => store.dispatch(actions.setLeader(s)))
 socket.on('editNick', s => store.dispatch(actions.editNick(s.payload)))
 socket.on('startGame', s => store.dispatch(actions.newGame(s)))
 socket.on('mergeGame', s => store.dispatch(actions.mergeGame(s)))
+socket.on('receiveLines', s => store.dispatch(actions.receiveLines(s)))
 class App extends React.Component{
   constructor(props){
     super(props);

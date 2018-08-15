@@ -64,6 +64,13 @@ export default createReducer({
     return oa({}, s, {
       game: oa({}, s.game, p)
     });
+  },
+  [actions.receiveLines]: (s, p) => {
+    return oa({}, s, {
+      game: s.you.id !== s.game.drawer ? oa({}, s.game, {
+        lines: p
+      }) : s.game
+    });
   }
 }, {
   users: [],
